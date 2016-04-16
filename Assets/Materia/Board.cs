@@ -8,17 +8,20 @@ public class Board : MonoBehaviour {
     public float nodeSize = .1f;
     public int BoardSize = 100;
     public static Board instance;
+    public Transform ExplosionPrefab;
 
     public float maxXorY { get { return BoardSize * nodeSize; } }
 
     Node focusedNode;
     public Node[,] Nodes;
+    List<Node> allNodes = new List<Node>();
     bool isInDragMode = false;
     Coords lastFocuseCoords;
 
 	void Start () {
         instance = this;
-        initMatrix();	
+        initMatrix();
+        detectFalls();
 	}
 
     void initMatrix()
@@ -41,7 +44,9 @@ public class Board : MonoBehaviour {
         var nodeCoord = toCoords(child.position);
 
         var node = child.gameObject.AddComponent<Node>();
+        Debug.Log(child.name + nodeCoord.x + ' ' + nodeCoord.y);
         node.Init(nodeCoord);
+        allNodes.Add(node);
         //Nodes[nodeCoord.x, nodeCoord.y] = node;
     }
 
@@ -92,20 +97,33 @@ public class Board : MonoBehaviour {
     private void Grow(Coords growCoords)
     {
         var nodeToMove = focusedNode.coords;
-        if (GetNeighbours(nodeToMove).Where(c => c.IsEqual(growCoords)).Count() == 0)
+        var coordShift = new Coords(nodeToMove.x, nodeToMove.y);
+
+        if (growCoords.x > focusedNode.coords.x)
+            coordShift.x++;
+        if (growCoords.x < focusedNode.coords.x)
+            coordShift.x--;
+
+        if (growCoords.y > focusedNode.coords.y)
+            coordShift.y++;
+        if (growCoords.y < focusedNode.coords.y)
+            coordShift.y--;
+
+        if (coordShift.IsEqual(focusedNode.coords))
             return;
 
-        Dictionary<Node, Coords> moved = new Dictionary<Node, Coords>();
-        MoveNodes(growCoords, nodeToMove, ref moved);
+        List<History> moved = new List<History>();
+        MoveNodes(coordShift, nodeToMove, ref moved);
 
     }
 
-    private void MoveNodes(Coords growCoords, Coords nodeToMove, ref Dictionary<Node, Coords> moved, int RecLvl = 0, Coords beforeChain = null)
+    private void MoveNodes(Coords growCoords, Coords nodeToMove, ref List<History> moved, int RecLvl = 0, Coords beforeChain = null)
     {
-        if (moved.ContainsKey(Nodes[nodeToMove.x, nodeToMove.y]) && (moved[Nodes[nodeToMove.x, nodeToMove.y]] == growCoords))
+        RecLvl++;
+        if (RecLvl > 25)
             return;
-
-        moved[Nodes[nodeToMove.x, nodeToMove.y]] = growCoords;
+        
+        moved.Add(new History(Nodes[nodeToMove.x, nodeToMove.y], growCoords));
 
         Debug.Log("place " + nodeToMove.x + ';' + nodeToMove.y + " to " + growCoords.x + ';' + growCoords.y);
         Nodes[nodeToMove.x, nodeToMove.y].placeOnCoords(growCoords);
@@ -115,7 +133,7 @@ public class Board : MonoBehaviour {
             && Math.Abs(Nodes[growCoords.x, growCoords.y].memory.coords.y - growCoords.y) > 1 )
         {
             MoveNodes(Nodes[growCoords.x, growCoords.y].lastCoords, 
-                Nodes[growCoords.x, growCoords.y].memory.coords, ref moved, RecLvl++, growCoords);
+                Nodes[growCoords.x, growCoords.y].memory.coords, ref moved, RecLvl, growCoords);
             return;
         }
 
@@ -128,23 +146,21 @@ public class Board : MonoBehaviour {
             .Where(c => !c.IsEqual(growCoords)
                 && Nodes[c.x, c.y] != null
                 && Nodes[c.x, c.y].isFixed == false);
-        if (possibleNodesToMove.Count() == 0)
+
+        Coords newtoMove = null;
+        foreach (var poss in possibleNodesToMove){
+            if (moved.Contains(new History(Nodes[nodeToMove.x, nodeToMove.y], growCoords)))
+                continue;
+
+            newtoMove = poss;
+            break;
+        }
+
+        if (newtoMove == null)
             return;
 
-
-        //var shift = new Coords(growCoords.x - nodeToMove.x, growCoords.y - nodeToMove.y);
-
-   
-        //if (shift.x == 0)
-         //   possibleNodesToMove = possibleNodesToMove.OrderBy(c => c.x);
-
-        //if (RecLvl > 5)
-        //    Unlock();
-
-        var newtoMove = possibleNodesToMove.First();
         Nodes[growCoords.x, growCoords.y].memory = Nodes[newtoMove.x, newtoMove.y];
-
-        MoveNodes(nodeToMove, newtoMove, ref moved, RecLvl++, growCoords);
+        MoveNodes(nodeToMove, newtoMove, ref moved, RecLvl, growCoords);
     }
 
     private void Slice()
@@ -178,32 +194,137 @@ public class Board : MonoBehaviour {
     }
 
     public void Unlock() {
-        isInDragMode = false;
-        Debug.Log("unlock");
         detectFalls();
+        isInDragMode = false;
+        focusedNode.Unfocus();
+        focusedNode = null;
+        
+        Debug.Log("unlock");
+        
 
     }
 
-    void detectFalls()
+    public void detectFalls()
     {
-        //detectFigure
-        List<Coords> figureNodes = getFigure();
-       // if (figureNodes.Where(c => Nodes[c.x,c.y].isFixed == true).Count() == 0)
+        try
+        {
+            foreach (var n in allNodes)
+            {
+                if (n.isChecked)
+                    continue;
+
+                List<Coords> figureNodes = getFigure(n);
+
+               List<Coords> surfaceNodes = new List<Coords>();
+                foreach (var figN in figureNodes)
+                    foreach (var posSurfN in GetNeighbours(figN).Where(f => Nodes[f.x, f.y] == null))
+                        if (surfaceNodes.Where(v => v.IsEqual(posSurfN)).Count() == 0)
+                            surfaceNodes.Add(posSurfN);
+
+                foreach (var surfN in surfaceNodes)
+                {
+                    var neighNulls = GetNeighbours(surfN);
+
+                    if (neighNulls.Where(p => Nodes[p.x, p.y] != null).Count() == 4)
+                        Explosion(surfN, 1);
+
+                    if (neighNulls.Where(p => Nodes[p.x, p.y] != null).Count() == 3)
+                    {
+                        var secondFrend = neighNulls.Where(p => Nodes[p.x, p.y] == null).First();
+                        if (GetNeighbours(secondFrend).Where(p => Nodes[p.x, p.y] != null).Count() == 3)
+                            Explosion(surfN, .25f);
+                    }
+                }
+
+                if (figureNodes.Where(c => Nodes[c.x, c.y].isFixed == true).Count() > 0)
+                    continue;
+                StartCoroutine(Falling(figureNodes));
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+    void Explosion(Coords coords, float power)
+    {
+        var Explode = 
+            ((Transform)Instantiate(ExplosionPrefab, new Vector3(coords.x * nodeSize, coords.y * nodeSize, transform.position.z), Quaternion.identity))
+            .GetComponent<ExplodeAfterPause>();
+
+        Explode.nearNodes = GetNeighbours(coords)
+            .Where(p => Nodes[p.x, p.y] != null && Nodes[p.x, p.y].isFixed == false)
+            .Select(p => Nodes[p.x, p.y])
+            .ToList();
+    }
+
+    private List<Coords> surfSearch(Coords sNode, List<Coords> surfaceNodes, List<Coords> explosingZone)
+    {
+        if (GetNeighbours(sNode).Where(p => Nodes[p.x, p.y] != null || surfaceNodes.Contains(p)).Count() == 4)
+        {
+            if (!explosingZone.Contains(sNode))
+            {
+                explosingZone.Add(sNode);
+                foreach (var p in GetNeighbours(sNode).Where(y => surfaceNodes.Contains(y)))
+                    explosingZone.Union(surfSearch(p, surfaceNodes, explosingZone));
+                
+                return explosingZone;
+            }
+        }
+        else
+        {
+            foreach (var p in explosingZone)
+                surfaceNodes.Remove(p);
+        }
+        return new List<Coords>();
+    }
+
+    IEnumerator Falling(List<Coords> figureNodes)
+    {
+        bool dropIsPossible = true;
+        foreach (var c in figureNodes)
+        {
+            if (c.y - 1 < 0)
+            {
+                dropIsPossible = false;
+                break;
+            }
+
+            if (Nodes[c.x, c.y - 1] != null
+                && (figureNodes.Where(t => t.IsEqual(new Coords(c.x, c.y - 1))).Count() == 0))
+            {
+                dropIsPossible = false;
+                break;
+            }
+        }
+
+        if (!dropIsPossible)
+            yield break;
 
         foreach (var c in figureNodes)
-            Nodes[c.x,c.y].Focus();
+        {
+            Nodes[c.x, c.y].placeOnCoords(new Coords(c.x, c.y - 1));
+            c.y -= 1;
+        }
+        yield return new WaitForSeconds(0.05f);
+        yield return StartCoroutine(Falling(figureNodes));
     }
 
-    private List<Coords> getFigure()
+    private List<Coords> getFigure(Node startNode)
     {
         List<Coords> figureNodes = new List<Coords>();
-        figureNodes.Add(focusedNode.coords);
+        figureNodes.Add(startNode.coords);
+        startNode.isChecked = true;
         int i = 0;
         while (i < figureNodes.Count)
         {
             foreach (var node in GetNeighbours(figureNodes[i]).Where(c => Nodes[c.x, c.y] != null))
                 if (figureNodes.Where(n => n.IsEqual(node)).Count() == 0)
+                {
                     figureNodes.Add(node);
+                    Nodes[node.x,node.y].isChecked = true;
+                }
 
             i++;
         }
@@ -221,16 +342,28 @@ public class Board : MonoBehaviour {
     public IEnumerable<Coords> GetNeighbours(Coords coords)
     {
         int[] d = { -1, 1 };
-      /*  return d
+       /*return d
             .SelectMany(x => d
                 .Select(y => new Coords(x + coords.x, y + coords.y))
             )
-            .Where(elem => IsInBounds(elem) && !elem.IsEqual(coords));
+            .Where(elem => IsInBounds(elem) && !elem.IsEqual(coords));*/
     
-       */
+
         return d.Select(x => new Coords(x + coords.x, coords.y))
             .Union(d.Select(y => new Coords(coords.x, y+ coords.y)))
             .Where(elem => IsInBounds(elem));
+    }
+}
+
+public struct History
+{
+    public Coords coords;
+    public Node node;
+
+    public History(Node node, Coords coords)
+    {
+        this.coords = coords;
+        this.node = node;
     }
 }
 
