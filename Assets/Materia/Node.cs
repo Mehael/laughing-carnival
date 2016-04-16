@@ -17,9 +17,6 @@ public class Node : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-            isChecked = false;
-
         if (Input.GetMouseButtonUp(0))
         {
             memory = null;
@@ -29,13 +26,18 @@ public class Node : MonoBehaviour {
 
     public void selfDestroy()
     {
-        Board.instance.Nodes[coords.x, coords.y] = null;
+        if (coords!=null && Board.instance.Nodes[coords.x, coords.y] != null)
+            Board.instance.Nodes[coords.x, coords.y] = null;
+        Board.instance.allNodes.Remove(this);
         Destroy(gameObject);
     }
 
     public void placeOnCoords(Coords newCoords){
         if (Board.instance.Nodes[newCoords.x, newCoords.y] != null)
-            Destroy(Board.instance.Nodes[newCoords.x, newCoords.y]);
+            if (Board.instance.Nodes[newCoords.x, newCoords.y].isFixed == false)
+                Board.instance.Nodes[newCoords.x, newCoords.y].selfDestroy();
+            else
+                selfDestroy();
 
         Board.instance.Nodes[newCoords.x, newCoords.y] = this; 
         if (coords != null)
