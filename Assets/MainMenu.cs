@@ -9,7 +9,7 @@ public class MainMenu : MonoBehaviour {
 
     public void StartButton()
     {
-        LevelManager.RestartLevel();
-        //LevelManager.NewGame();
+        //LevelManager.RestartLevel();
+        LevelManager.NewGame();
     }
 }

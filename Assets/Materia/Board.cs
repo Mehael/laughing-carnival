@@ -24,6 +24,7 @@ public class Board : MonoBehaviour {
         instance = this;
         initMatrix();
         detectFalls();
+        Time.fixedDeltaTime = 0.002f;
 	}
 
     void initMatrix()
@@ -48,7 +49,10 @@ public class Board : MonoBehaviour {
         var node = child.gameObject.AddComponent<Node>();
         Debug.Log(child.name + nodeCoord.x + ' ' + nodeCoord.y);
         node.Init(nodeCoord);
-        allNodes.Add(node);
+        if (!node.isFixed)
+        {
+            allNodes.Add(node);
+        }
         //Nodes[nodeCoord.x, nodeCoord.y] = node;
     }
 
@@ -209,6 +213,7 @@ public class Board : MonoBehaviour {
             return;
 
         isInDragMode = true;
+        Time.timeScale = 0.05f;
     }
 
     public void Unlock() {
@@ -221,6 +226,8 @@ public class Board : MonoBehaviour {
         if (focusedNode != null)
             focusedNode.Unfocus();
         focusedNode = null;
+        Time.timeScale = 1f;
+
         Debug.Log("unlock");
         
 

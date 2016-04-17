@@ -7,7 +7,7 @@ public static class LevelManager
     private const string LevelNameTemplate = "Level";
     private const string ClipNameTemplate = "Clip";
     private static int savedLevel;
-    private static int currentLevel;
+    public static int currentLevel;
     private static int currentClip;
 
     public static bool HaveSavedLevel
@@ -27,6 +27,11 @@ public static class LevelManager
 
     private static string nameBuffer;
     private static bool isLoading;
+
+    public static void LoadSpecialClip(string name)
+    {
+        LoadScene(name);
+    }
 
     private static void LoadScene(string name)
     {

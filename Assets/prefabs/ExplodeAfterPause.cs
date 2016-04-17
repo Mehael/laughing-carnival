@@ -28,8 +28,15 @@ public class ExplodeAfterPause : MonoBehaviour {
         }
 
         GetComponent<PointEffector2D>().enabled = true;
+
+        //if (LevelManager.currentLevel == 7)
+            if (Vector3.Distance(transform.position, new Vector3(10f, 6.5f, transform.position.z)) < 1.7f)
+                LevelManager.LoadSpecialClip("Kill Clip");
+
         yield return new WaitForSeconds(0.1f);
         Board.instance.detectFalls();
         Destroy(gameObject);
 	}
+
+
 }

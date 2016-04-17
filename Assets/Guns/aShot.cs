@@ -36,12 +36,4 @@ public abstract class aShot : MonoBehaviour {
 
     public virtual void Move() { }
 
-    void OnTriggerEnter2D(Collider2D other) 
-    {
-        if (other.gameObject.tag != "EnemyShot")
-            Destroy(gameObject);
-            //coll.gameObject.SendMessage("ApplyDamage", damage);
-
-       
-    }
 }
