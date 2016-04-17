@@ -12,7 +12,7 @@ public class Board : MonoBehaviour {
 
     public float maxXorY { get { return BoardSize * nodeSize; } }
 
-    Node focusedNode;
+    public Node focusedNode;
     public Node[,] Nodes;
     public Transform NodePieces;
     public List<Node> allNodes = new List<Node>();
@@ -52,26 +52,23 @@ public class Board : MonoBehaviour {
         //Nodes[nodeCoord.x, nodeCoord.y] = node;
     }
 
-
     public void FocuseNode(Vector3 v3position)
     {
-        if (v3position.x > 0 && v3position.y > 0
-            && v3position.x < maxXorY && v3position.y < maxXorY)
-        {
-            var coords = toCoords(v3position);
-            if (coords.IsEqual(lastFocuseCoords) && isInDragMode == false)
-                return;
-            if (isInDragMode == true && focusedNode != null && coords.IsEqual(focusedNode.coords))
-                return;
+        var coords = toCoords(v3position);
+        if (coords.IsEqual(lastFocuseCoords) && isInDragMode == false)
+            return;
 
-            lastFocuseCoords = coords;
-            Debug.Log("underMouse " + coords.x + ";" + coords.y);
+        if (isInDragMode == true && focusedNode != null && coords.IsEqual(focusedNode.coords))
+            return;
 
-            if (isInDragMode)
-                DragMode(coords);     
-            else
-                SelectMode(coords);
-        }
+        lastFocuseCoords = coords;
+        Debug.Log("underMouse " + coords.x + ";" + coords.y);
+
+        if (isInDragMode)
+            DragMode(coords);
+        else
+            SelectMode(coords);
+
     }
 
     private void SelectMode(Coords coords)
@@ -215,12 +212,15 @@ public class Board : MonoBehaviour {
     }
 
     public void Unlock() {
-        detectFalls();
+        if (isInDragMode)
+        {
+            detectFalls();
+        }
+
         isInDragMode = false;
         if (focusedNode != null)
-        focusedNode.Unfocus();
+            focusedNode.Unfocus();
         focusedNode = null;
-        
         Debug.Log("unlock");
         
 

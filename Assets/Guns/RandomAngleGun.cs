@@ -16,6 +16,7 @@ public class RandomAngleGun : aGun {
 
     public override void Shoot()
     {
+        if (target!= null)
         (Instantiate(shot, transform.position, Quaternion.identity) as GameObject)
             .transform.LookAt2d(target.position, Mathf.Sin(_counter)*30);
     }
