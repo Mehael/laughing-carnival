@@ -4,6 +4,10 @@ using System.Collections;
 public class FadeManager: MonoBehaviour
 {
     public static FadeManager instance;
+    public AudioClip loose;
+    public AudioClip expl;
+    public AudioClip hurt;
+    public AudioSource aso;
 
     public float speed = 1f;
     float alpha = 0;
@@ -13,6 +17,21 @@ public class FadeManager: MonoBehaviour
 
     public delegate void act();
     SpriteRenderer sr;
+
+    public static void Hurt()
+    {
+        instance.aso.PlayOneShot(instance.hurt);
+    }
+
+    public static void Expl()
+    {
+        instance.aso.PlayOneShot(instance.expl);
+    }
+
+    public static void Lose()
+    {
+        instance.aso.PlayOneShot(instance.loose);
+    }
 
     public static void Fade(act postFade)
     {

@@ -50,4 +50,9 @@ public class linemonsrer : MonoBehaviour
         if (coll.gameObject.tag == "Player")
             LevelManager.RestartLevel();
     }
+
+    void OnDestroy()
+    {
+        FadeManager.Hurt();
+    }
 }

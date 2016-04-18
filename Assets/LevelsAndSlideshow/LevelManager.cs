@@ -68,6 +68,7 @@ public static class LevelManager
     public static void RestartLevel()
     {
         if (isLoading) return;
+        FadeManager.Lose();
         LoadScene(GetLevelName(currentLevel));
     }
 
