@@ -11,6 +11,8 @@ public class aGun : MonoBehaviour {
     void Start()
     {
         _pastTime = reloadTime;
+        if (target == null)
+            target = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     void FixedUpdate () {

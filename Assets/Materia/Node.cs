@@ -61,6 +61,6 @@ public class Node : MonoBehaviour {
 
     public void Unfocus()
     {
-        renderer.color = new Color(1f, 1f, 1f);
+        renderer.color = new Color(0.55f, 0.67f, 0.65f);
     }
 }
