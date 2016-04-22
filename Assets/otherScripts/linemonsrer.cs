@@ -25,7 +25,8 @@ public class linemonsrer : MonoBehaviour
 
     void Jump()
     {
-        GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce);
+        if (Time.timeScale==1f)
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce);
     }
 
     // Update is called once per frame
