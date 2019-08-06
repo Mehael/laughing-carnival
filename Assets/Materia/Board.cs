@@ -47,7 +47,7 @@ public class Board : MonoBehaviour {
         var nodeCoord = toCoords(child.position);
 
         var node = child.gameObject.AddComponent<Node>();
-        Debug.Log(child.name + nodeCoord.x + ' ' + nodeCoord.y);
+        //Debug.Log(child.name + nodeCoord.x + ' ' + nodeCoord.y);
         node.Init(nodeCoord);
         if (!node.isFixed)
         {
@@ -66,7 +66,7 @@ public class Board : MonoBehaviour {
             return;
 
         lastFocuseCoords = coords;
-        Debug.Log("underMouse " + coords.x + ";" + coords.y);
+        //Debug.Log("underMouse " + coords.x + ";" + coords.y);
 
         if (isInDragMode)
             DragMode(coords);
@@ -228,9 +228,7 @@ public class Board : MonoBehaviour {
         focusedNode = null;
         Time.timeScale = 1f;
 
-        Debug.Log("unlock");
-        
-
+        //Debug.Log("unlock");
     }
 
     public void detectFalls()

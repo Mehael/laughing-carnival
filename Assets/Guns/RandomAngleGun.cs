@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using ExtensionMethods;
-
+using ExtensionsMethods;
 public class RandomAngleGun : aGun {
     float _counter = 0;
     float _counterSpeed = 2;
@@ -17,7 +16,7 @@ public class RandomAngleGun : aGun {
     public override void Shoot()
     {
         if (target!= null)
-        (Instantiate(shot, transform.position, Quaternion.identity) as GameObject)
-            .transform.LookAt2d(target.position, Mathf.Sin(_counter)*30);
+            (Instantiate(shot, transform.position, Quaternion.identity) as GameObject)
+                .transform.LookAt2D(new Vector2(Mathf.Cos(_counter),Mathf.Sin(_counter))*30, target.position);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using ExtensionMethods;
+using ExtensionsMethods;
 
 public abstract class aShot : MonoBehaviour {
     public int damage = 0;
@@ -21,13 +21,13 @@ public abstract class aShot : MonoBehaviour {
         _target = player;
         _targetPositionOnShoot = _target.transform.position;
 
-        transform.LookAt2d(_target.transform);
+        transform.LookAt2D(Vector2.up, _target.transform);
     }
 
     public virtual void SetTarget(Vector3 target)
     {
         _targetPositionOnShoot = target;
-        transform.LookAt2d(target);
+        transform.LookAt2D(Vector2.up, target);
     }
 
 	void FixedUpdate () {

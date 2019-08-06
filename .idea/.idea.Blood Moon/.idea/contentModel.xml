@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\MyIndieWorld\Blood Moon" t="IncludeRecursive">
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets" t="Include">
+        <e p="dontDestr.cs" t="Include" />
+        <e p="Guns" t="Include">
+          <e p="aGun.cs" t="Include" />
+          <e p="aShot.cs" t="Include" />
+          <e p="ConstantAnimation.cs" t="Include" />
+          <e p="RandomAngleGun.cs" t="Include" />
+          <e p="SimpleShot.cs" t="Include" />
+        </e>
+        <e p="LevelsAndSlideshow" t="Include">
+          <e p="ClipPlayer.cs" t="Include" />
+          <e p="FadeManager.cs" t="Include" />
+          <e p="LevelManager.cs" t="Include" />
+        </e>
+        <e p="Materia" t="Include">
+          <e p="Board.cs" t="Include" />
+          <e p="Fixed.cs" t="Include" />
+          <e p="Magic.cs" t="Include" />
+          <e p="Node.cs" t="Include" />
+        </e>
+        <e p="otherScripts" t="Include">
+          <e p="BackgroundParallax.cs" t="Include" />
+          <e p="CamerePosition.cs" t="Include" />
+          <e p="destroyAfterTime.cs" t="Include" />
+          <e p="Extensions.cs" t="Include" />
+          <e p="footer.cs" t="Include" />
+          <e p="headDeath.cs" t="Include" />
+          <e p="LampTrigger.cs" t="Include" />
+          <e p="linemonsrer.cs" t="Include" />
+          <e p="MainMenu.cs" t="Include" />
+          <e p="nextLevel.cs" t="Include" />
+          <e p="Player.cs" t="Include" />
+          <e p="RestartButton.cs" t="Include" />
+          <e p="Target.cs" t="Include" />
+          <e p="trap.cs" t="Include" />
+        </e>
+        <e p="prefabs" t="Include">
+          <e p="ExplodeAfterPause.cs" t="Include" />
+        </e>
+        <e p="Sprites" t="Include">
+          <e p="Spawner.cs" t="Include" />
+        </e>
+      </e>
+      <e p="Blood Moon.sln" t="IncludeFlat" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="Packages" t="ExcludeRecursive" />
+      <e p="Temp\bin" t="ExcludeRecursive" />
+    </e>
+    <e p="C:\Users\Linver\.Rider2019.1\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Linver\.Rider2019.1\system\resharper-host\local\Transient\ReSharperHost\v191\SolutionCaches\_Blood Moon.-265957604.00" t="ExcludeRecursive" />
+  </component>
+</project>
